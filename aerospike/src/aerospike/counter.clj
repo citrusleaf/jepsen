@@ -1,4 +1,4 @@
-(ns aerospike.counter
+ (ns aerospike.counter
   "Incrementing a counter"
   (:require [aerospike.support :as s]
             [clojure [pprint :refer [pprint]]
@@ -75,7 +75,7 @@
 (defn workload
   []
   {:client    (counter-client)
-   :generator (->> (repeat 100 add)
+   :generator (->> (repeat 1 add)
                    (cons r)
                    gen/mix
                    (gen/delay 1/100))
