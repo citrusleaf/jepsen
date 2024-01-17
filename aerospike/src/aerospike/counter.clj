@@ -75,7 +75,7 @@
 (defn workload
   []
   {:client    (counter-client)
-   :generator (cons r (repeat 1 add))
+   :generator '(add r)
    ; :generator (->> (repeat 100 add)
    ;                 (cons r)
    ;                 gen/mix
