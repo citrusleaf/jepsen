@@ -50,14 +50,14 @@
                 checker
                 model]} workload
         time-limit (:time-limit opts)
-        generator (->> generator
-                       (gen/nemesis
-                         (->> (:generator nemesis)
-                              (gen/delay (if (= :pause (:workload opts))
-                                           0 ; The pause workload has its own
-                                             ; schedule
-                                           (:nemesis-interval opts)))))
-                       (gen/time-limit (:time-limit opts)))
+        ; generator (->> generator
+        ;                (gen/nemesis
+        ;                  (->> (:generator nemesis)
+        ;                       (gen/delay (if (= :pause (:workload opts))
+        ;                                    0 ; The pause workload has its own
+        ;                                      ; schedule
+        ;                                    (:nemesis-interval opts)))))
+        ;                (gen/time-limit (:time-limit opts)))
         generator (if-not (or final-generator (:final-generator nemesis))
                     generator
                     (gen/phases generator
