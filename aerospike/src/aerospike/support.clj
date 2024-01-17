@@ -504,11 +504,11 @@
 
        ; Timeouts could be either successful or failing
        (catch AerospikeException$Timeout e#
-         (assoc ~op :type error-type#, :error :timeout :indoubt (.getInDoubt e#)))
+         (assoc ~op :type error-type#, :error :timeout))
 
        ;; Connection errors could be either successful or failing
        (catch AerospikeException$Connection e#
-         (assoc ~op :type error-type#, :error :connection :indoubt (.getInDoubt e#)))
+         (assoc ~op :type error-type#, :error :connection))
 
        (catch ExceptionInfo e#
          (case (.getMessage e#)
@@ -522,29 +522,29 @@
            ; This is error code "OK", which I guess also means "dunno"?
            0 (condp instance? (.getCause e#)
                java.io.EOFException
-               (assoc ~op :type error-type#, :error :eof :indoubt (.getInDoubt e#))
+               (assoc ~op :type error-type#, :error :eof)
 
                java.net.SocketException
-               (assoc ~op :type error-type#, :error :socket-error :indoubt (.getInDoubt e#))
+               (assoc ~op :type error-type#, :error :socket-error)
 
                (throw e#))
 
            ; Generation error; CAS can't have taken place.
-           3 (assoc ~op :type :fail, :error :generation-mismatch :indoubt (.getInDoubt e#))
+           3 (assoc ~op :type :fail, :error :generation-mismatch)
 
-           -8 (assoc ~op :type error-type#, :error :server-unavailable :indoubt (.getInDoubt e#))
+           -8 (assoc ~op :type error-type#, :error :server-unavailable)
 
            ; With our custom client, these are guaranteed failures. Not so in
            ; the stock client!
-           11 (assoc ~op :type :fail, :error :partition-unavailable :indoubt (.getInDoubt e#))
+           11 (assoc ~op :type :fail, :error :partition-unavailable)
 
            ; Hot key
-           14 (assoc ~op :type :fail, :error :hot-key :indoubt (.getInDoubt e#))
+           14 (assoc ~op :type :fail, :error :hot-key)
 
            ;; Forbidden
-           22 (assoc ~op :type :fail, :error [:forbidden (.getMessage e#)] :indoubt (.getInDoubt e#))
+           22 (assoc ~op :type :fail, :error [:forbidden (.getMessage e#)])
 
-           (do (info :error-code (.getResultCode e#) :indoubt (.getInDoubt e#))
+           (do (info :error-code (.getResultCode e#))
                (throw e#)))))))
 
 (defmacro with-errors
