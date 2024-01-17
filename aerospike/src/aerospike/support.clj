@@ -520,8 +520,8 @@
        (catch ExceptionInfo e#
          (case (.getMessage e#)
            ; Skipping a CAS can't affect the DB state
-           "skipping cas"  (assoc ~op :type :fail, :error :value-mismatch)
-           "cas not found" (assoc ~op :type :fail, :error :not-found)
+           "skipping cas"  (log-it (assoc ~op :type :fail, :error :value-mismatch))
+           "cas not found" (log-it (assoc ~op :type :fail, :error :not-found))
            (throw e#)))
 
        (catch com.aerospike.client.AerospikeException e#
