@@ -497,7 +497,7 @@
   (warn "log-it" val)
   val)
 
-(defmacro with-errors-inner
+(defmacro with-errors
   "Takes an invocation operation, a set of idempotent operations :f's which can
   safely be assumed to fail without altering the model state, and a body to
   evaluate. Catches errors and maps them to failure ops matching the
@@ -553,22 +553,6 @@
 
            (do (info :error-code (.getResultCode e#))
                (throw e#)))))))
-
-(defmacro with-errors
-  "Takes an invocation operation, a set of idempotent operations :f's which can
-  safely be assumed to fail without altering the model state, and a body to
-  evaluate. Catches errors and maps them to failure ops matching the
-  invocation."
-  [op idempotent-ops & body]
-
-  `(let [inner-res# (with-errors-inner ~op ~idempotent-ops ~@body)]
-     (if (= (inner-res# :type) :info)
-       (do
-         (warn "with-errors:" inner-res#)
-         inner-res#)
-       inner-res#)
-     )
-  )
 
 (defprotocol Generator
   (op [gen test process] "Yields an operation to apply."))
