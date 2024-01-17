@@ -490,6 +490,13 @@
   [^AerospikeClient client namespace set key bins]
   (.add client write-policy (Key. namespace set key) (map->bins bins)))
 
+(defn log-it
+  "test"
+  [val]
+
+  (warn "log-it" val)
+  val)
+
 (defmacro with-errors-inner
   "Takes an invocation operation, a set of idempotent operations :f's which can
   safely be assumed to fail without altering the model state, and a body to
@@ -504,11 +511,11 @@
 
        ; Timeouts could be either successful or failing
        (catch AerospikeException$Timeout e#
-         (assoc ~op :type error-type#, :error :timeout))
+         (log-it (assoc ~op :type error-type#, :error :timeout)))
 
        ;; Connection errors could be either successful or failing
        (catch AerospikeException$Connection e#
-         (assoc ~op :type error-type#, :error :connection))
+         (log-it (assoc ~op :type error-type#, :error :connection)))
 
        (catch ExceptionInfo e#
          (case (.getMessage e#)
@@ -522,27 +529,27 @@
            ; This is error code "OK", which I guess also means "dunno"?
            0 (condp instance? (.getCause e#)
                java.io.EOFException
-               (assoc ~op :type error-type#, :error :eof)
+               (log-it (assoc ~op :type error-type#, :error :eof))
 
                java.net.SocketException
-               (assoc ~op :type error-type#, :error :socket-error)
+               (log-it (assoc ~op :type error-type#, :error :socket-error))
 
                (throw e#))
 
            ; Generation error; CAS can't have taken place.
-           3 (assoc ~op :type :fail, :error :generation-mismatch)
+           3 (log-it (assoc ~op :type :fail, :error :generation-mismatch))
 
-           -8 (assoc ~op :type error-type#, :error :server-unavailable)
+           -8 (log-it (assoc ~op :type error-type#, :error :server-unavailable))
 
            ; With our custom client, these are guaranteed failures. Not so in
            ; the stock client!
-           11 (assoc ~op :type :fail, :error :partition-unavailable)
+           11 (log-it (assoc ~op :type :fail, :error :partition-unavailable))
 
            ; Hot key
-           14 (assoc ~op :type :fail, :error :hot-key)
+           14 (log-it (assoc ~op :type :fail, :error :hot-key))
 
            ;; Forbidden
-           22 (assoc ~op :type :fail, :error [:forbidden (.getMessage e#)])
+           22 (log-it (assoc ~op :type :fail, :error [:forbidden (.getMessage e#)]))
 
            (do (info :error-code (.getResultCode e#))
                (throw e#)))))))
