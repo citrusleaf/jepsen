@@ -490,7 +490,7 @@
   [^AerospikeClient client namespace set key bins]
   (.add client write-policy (Key. namespace set key) (map->bins bins)))
 
-(defmacro with-errors
+(defmacro with-errors-inner
   "Takes an invocation operation, a set of idempotent operations :f's which can
   safely be assumed to fail without altering the model state, and a body to
   evaluate. Catches errors and maps them to failure ops matching the
@@ -504,11 +504,11 @@
 
        ; Timeouts could be either successful or failing
        (catch AerospikeException$Timeout e#
-         (assoc ~op :type error-type#, :error :timeout))
+         (assoc ~op :type error-type#, :error :timeout :indoubt (.getInDoubt e#)))
 
        ;; Connection errors could be either successful or failing
        (catch AerospikeException$Connection e#
-         (assoc ~op :type error-type#, :error :connection))
+         (assoc ~op :type error-type#, :error :connection :indoubt (.getInDoubt e#)))
 
        (catch ExceptionInfo e#
          (case (.getMessage e#)
@@ -522,30 +522,46 @@
            ; This is error code "OK", which I guess also means "dunno"?
            0 (condp instance? (.getCause e#)
                java.io.EOFException
-               (assoc ~op :type error-type#, :error :eof)
+               (assoc ~op :type error-type#, :error :eof :indoubt (.getInDoubt e#))
 
                java.net.SocketException
-               (assoc ~op :type error-type#, :error :socket-error)
+               (assoc ~op :type error-type#, :error :socket-error :indoubt (.getInDoubt e#))
 
                (throw e#))
 
            ; Generation error; CAS can't have taken place.
-           3 (assoc ~op :type :fail, :error :generation-mismatch)
+           3 (assoc ~op :type :fail, :error :generation-mismatch :indoubt (.getInDoubt e#))
 
-           -8 (assoc ~op :type error-type#, :error :server-unavailable)
+           -8 (assoc ~op :type error-type#, :error :server-unavailable :indoubt (.getInDoubt e#))
 
            ; With our custom client, these are guaranteed failures. Not so in
            ; the stock client!
-           11 (assoc ~op :type :fail, :error :partition-unavailable)
+           11 (assoc ~op :type :fail, :error :partition-unavailable :indoubt (.getInDoubt e#))
 
            ; Hot key
-           14 (assoc ~op :type :fail, :error :hot-key)
+           14 (assoc ~op :type :fail, :error :hot-key :indoubt (.getInDoubt e#))
 
            ;; Forbidden
-           22 (assoc ~op :type :fail, :error [:forbidden (.getMessage e#)])
+           22 (assoc ~op :type :fail, :error [:forbidden (.getMessage e#)] :indoubt (.getInDoubt e#))
 
-           (do (info :error-code (.getResultCode e#))
+           (do (info :error-code (.getResultCode e#) :indoubt (.getInDoubt e#))
                (throw e#)))))))
+
+(defmacro with-errors
+  "Takes an invocation operation, a set of idempotent operations :f's which can
+  safely be assumed to fail without altering the model state, and a body to
+  evaluate. Catches errors and maps them to failure ops matching the
+  invocation."
+  [op idempotent-ops & body]
+
+  `(let [inner-res# (with-errors-inner ~op ~idempotent-ops ~@body)]
+     (if (= (inner-res# :type) :info)
+       (do
+         (warn "with-errors:" inner-res#)
+         inner-res#)
+       inner-res#)
+     )
+  )
 
 (defprotocol Generator
   (op [gen test process] "Yields an operation to apply."))
