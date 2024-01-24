@@ -1,4 +1,4 @@
- (ns aerospike.counter
+(ns aerospike.counter
   "Incrementing a counter"
   (:require [aerospike.support :as s]
             [clojure [pprint :refer [pprint]]
@@ -44,12 +44,10 @@
   client/Client
   (open! [this test node]
     (let [client (s/connect node)]
-      (Thread/sleep 3000) ; TODO: remove?
-      (s/put! client namespace set key {:value 0})
       (assoc this :client client)))
 
   (setup! [this test] this)
-  
+
   (invoke! [this test op]
     (s/with-errors op #{:read}
       (case (:f op)
@@ -60,7 +58,7 @@
                   (assoc op :type :ok)))))
 
   (teardown! [this test])
-
+    
   (close! [this test]
     (s/close client)))
 
@@ -75,9 +73,8 @@
 (defn workload
   []
   {:client    (counter-client)
-   :generator [(gen/once add) (gen/once r)]
-   ; :generator (->> (repeat 100 add)
-   ;                 (cons r)
-   ;                 gen/mix
-   ;                 (gen/delay 1/100))
+   :generator (->> (repeat 100 add)
+                   (cons r)
+                   gen/mix
+                   (gen/delay 1/100))
    :checker   (checker/counter)})
