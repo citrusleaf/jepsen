@@ -64,8 +64,6 @@
                               2  ; number of times to read each key @ end
                               
                               (range (inc @max-key))  ; which keys to read.
-                              ; FIXME : read up to concurrency // worker's N
-                              ; (range (inc @max-key))  <-- only reads key 0
                               
                               (fn [k]
                                 (gen/stagger 10
