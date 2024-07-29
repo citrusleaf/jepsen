@@ -35,6 +35,6 @@
 
 (defn workload []
   {:client (dumbClient)
-;;    :checker (checker/set)
-;;    :generator (dbNemesis/full-gen {})
+   :checker (checker/set)
+   :generator (dbNemesis/full-gen {})
   })
