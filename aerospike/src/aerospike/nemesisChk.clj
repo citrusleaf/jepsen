@@ -5,9 +5,7 @@
             ;; [clojure.string :as str]
             [jepsen [client :as client]
              [checker :as checker]
-             [generator :as gen]]
-            [jepsen.client :as client]
-            [jepsen.checker :as checker])
+             [generator :as gen]])
   )
 
 
