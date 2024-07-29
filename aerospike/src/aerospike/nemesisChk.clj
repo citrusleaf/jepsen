@@ -27,7 +27,5 @@
   {:client (dumbClient)
    :checker (checker/counter)
    :generator (->> (repeat 1000 add)
-                (cons r)
-                gen/mix
-                (gen/delay 120))
+                   (gen/delay 120))
   })
