@@ -8,10 +8,21 @@
              [generator :as gen]])
   )
 
+(defrecord myClient [client namespace set]
+  client/Client
+  (open! [this test node] (assoc this :client (s/connect node)))
+  (setup! [this test] this)
+  (invoke! [this test op] (assoc op :type :fail))
+  (teardown! [this test])
+  (close! [this test] (s/close client)) 
+  )
+
+(defn dumbClient []
+  (myClient. nil s/ans "foo"))
 
 (defn workload []
   {
-   :client (client/Client)
+   :client (myClient)
    :checker (checker/set)
    :generator (dbNemesis/full-gen {})
   })
