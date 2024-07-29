@@ -1162,7 +1162,10 @@
       (if-let [[op gen'] (op (nth gens i) test ctx)]
         ; Good, we have an op
          (let [idx (rand-int (count gens))]
-          (info "i=" i "using index" idx "--> op:= " op)
+           (if (not (= op :pending))
+              (info "i=" i "using index" idx "--> op:= " op "\n--Gen'[0] :=" (take 1 gen')) 
+              nil
+            )
           [op (Mix. idx (assoc gens i gen'))]
          )         
         ; Oh, we're out of ops on this generator. Compact and recur.
