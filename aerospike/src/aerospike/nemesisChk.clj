@@ -6,7 +6,20 @@
             [jepsen [client :as client]
              [checker :as checker]
              [generator :as gen]])
-  )
+  (:import (clojure.lang ExceptionInfo)
+           (com.aerospike.client AerospikeClient
+                                 AerospikeException
+                                 AerospikeException$Connection
+                                 AerospikeException$Timeout
+                                 Bin
+                                 Info
+                                 Key
+                                 Record)
+           (com.aerospike.client.cluster Node)
+           (com.aerospike.client.policy Policy
+                                          ;; ConsistencyLevel
+                                        GenerationPolicy
+                                        WritePolicy)))
 
 (defrecord myClient [client namespace set]
   client/Client
@@ -21,8 +34,7 @@
   (myClient. nil s/ans "foo"))
 
 (defn workload []
-  {
-   :client (myClient)
-   :checker (checker/set)
-   :generator (dbNemesis/full-gen {})
+  {:client (myClient)
+;;    :checker (checker/set)
+;;    :generator (dbNemesis/full-gen {})
   })
