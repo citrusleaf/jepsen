@@ -73,10 +73,10 @@
                                 (gen/log "Waiting for quiescence")
                                 (gen/sleep 10)
                                 (gen/clients final-generator)))]
-    (info "constructed jepsen test-map")
     ;; ()
-    (info "Nemesis ==>" (with-out-str (pprint nemesis)))
-    
+    (info "constructed jepsen test-map")
+    (info "Nemesis ==>" )
+    (pprint nemesis)
     ;; (info "N-Gen ====> " (:generator nemesis))
     (merge tests/noop-test
            opts
