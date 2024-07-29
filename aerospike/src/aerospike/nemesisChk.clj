@@ -34,7 +34,7 @@
   (myClient. nil s/ans "foo"))
 
 (defn workload []
-  {:client (myClient)
+  {:client (dumbClient)
 ;;    :checker (checker/set)
 ;;    :generator (dbNemesis/full-gen {})
   })
