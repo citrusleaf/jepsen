@@ -26,8 +26,8 @@
 (defn workload []
   {:client (dumbClient)
    :checker (checker/counter)
-   :generator (->> (repeat 100 add)
+   :generator (->> (repeat 1000 add)
                 (cons r)
                 gen/mix
-                (gen/delay 10))
+                (gen/delay 120))
   })

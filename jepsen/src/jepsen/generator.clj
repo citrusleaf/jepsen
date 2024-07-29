@@ -1161,7 +1161,10 @@
     (when-not (= 0 (count gens))
       (if-let [[op gen'] (op (nth gens i) test ctx)]
         ; Good, we have an op
-        [op (Mix. (rand-int (count gens)) (assoc gens i gen'))]
+         (let [idx (rand-int (count gens))]
+          (info "i=" i "using index" idx "--> gen:= " gen')
+          [op (Mix. idx (assoc gens i gen'))]
+         )         
         ; Oh, we're out of ops on this generator. Compact and recur.
         (op (Mix. (rand-int (dec (count gens))) (dissoc-vec gens i))
             test ctx))))
