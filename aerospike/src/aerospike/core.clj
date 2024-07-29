@@ -4,6 +4,7 @@
                        [counter :as counter]
                        [cas-register :as cas-register]
                        [nemesis :as nemesis]
+                       [nemesisChk :as nChk]
                        [pause :as pause]
                        [set :as set]
                        [transact :as transact]
@@ -33,6 +34,7 @@
    :set          (set/workload)
    :transact     (transact/workload)
    :list-append  (transact/workload-ListAppend)
+   :nChk         (nChk/workload)
    :pause        :pause}) ; special case
 
 (defn workload+nemesis
