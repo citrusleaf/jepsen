@@ -33,8 +33,14 @@
 (defn dumbClient []
   (myClient. nil s/ans "foo"))
 
+(defn r   [_ _] {:type :invoke, :f :read})
+(defn add [_ _] {:type :invoke, :f :add, :value 1})
+
 (defn workload []
   {:client (dumbClient)
-   :checker (checker/set)
-   :generator (dbNemesis/full-gen {})
+   :checker (checker/counter)
+   :generator (->> (repeat 100 add)
+                (cons r)
+                gen/mix
+                (gen/delay 10))
   })
