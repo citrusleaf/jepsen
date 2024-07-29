@@ -75,9 +75,6 @@
                                 (gen/clients final-generator)))]
     ;; ()
     (info "constructed jepsen test-map")
-    (info "Nemesis ==>" )
-    (pprint nemesis)
-    ;; (info "N-Gen ====> " (:generator nemesis))
     (merge tests/noop-test
            opts
            {:name     (str "aerospike " (name (:workload opts)))
