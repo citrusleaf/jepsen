@@ -15,7 +15,8 @@
              [checker :as checker]
              [generator :as gen]
              [tests :as tests]]
-            [jepsen.os.debian :as debian])
+            [jepsen.os.debian :as debian]
+            [jepsen.generator :as gen])
   (:gen-class))
 
 (defn workloads
@@ -74,8 +75,9 @@
                                 (gen/log "Waiting for quiescence")
                                 (gen/sleep 10)
                                 (gen/clients final-generator)))]
-    ;; ()
-    (info "constructed jepsen test-map")
+    (info "constructed jepsen test-map!")
+    (info "jepsen test total generator>")
+    (info (take 20 generator))
     (merge tests/noop-test
            opts
            {:name     (str "aerospike " (name (:workload opts)))
