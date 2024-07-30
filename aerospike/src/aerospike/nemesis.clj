@@ -1,5 +1,6 @@
 (ns aerospike.nemesis
   (:require [aerospike [support :as s]]
+            [clojure.tools.logging :refer [debug info warn]]
             [jepsen [control :as c]
                     [generator :as gen]
                     [nemesis :as nemesis]
@@ -88,6 +89,7 @@
                          [revive-gen recluster-gen])]
                       (remove nil?)
                       vec)]
+    (debug patterns)
     (mapcat rand-nth (repeat patterns))))
 
 (defn killer-gen
