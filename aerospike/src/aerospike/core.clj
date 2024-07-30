@@ -76,8 +76,8 @@
                                 (gen/sleep 10)
                                 (gen/clients final-generator)))]
     (info "constructed jepsen test-map!")
-    (info "jepsen test total generator>")
-    (info (take 20 generator))
+    (info "jepsen test total generator 3x3>")
+    (info (take 3 (take 3 generator)))
     (merge tests/noop-test
            opts
            {:name     (str "aerospike " (name (:workload opts)))
