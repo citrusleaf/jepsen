@@ -5,7 +5,8 @@
                     [generator :as gen]
                     [nemesis :as nemesis]
                     [util :refer [meh random-nonempty-subset]]]
-            [jepsen.nemesis.time :as nt]))
+            [jepsen.nemesis.time :as nt]
+            [jepsen.generator :as gen]))
 
 ; Nemeses
 
@@ -82,7 +83,7 @@
 (defn killer-gen-seq
   "Sequence of kills, restarts, revivals, and reclusterings"
   [test]
-  (info "in (killer-gen-seq [test]) cal")
+  (info "in (killer-gen-seq [test]) call")
   (let [patterns (->> [[kill-gen]
                        [restart-gen]
                        ; Revive then recluster
@@ -96,7 +97,7 @@
 (defn killer-gen
   "A mix of kills, restarts, revivals, and reclusterings"
   [test]
-   (killer-gen-seq test))
+   (gen/mix (killer-gen-seq test)))
 
 (defn full-nemesis
   "Handles kills, restarts, revives, reclusters, clock skew, and partitions."
@@ -138,7 +139,7 @@
   (let [dead (atom #{})
         opts (assoc opts :dead dead)]
     {:nemesis (full-nemesis opts)
-     :generator (killer-gen-seq opts)
+     :generator (killer-gen opts)
      :final-generator (gen/concat
                         (gen/once {:type :info, :f :partition-stop})
                         (gen/once {:type :info, :f :clock-reset})
