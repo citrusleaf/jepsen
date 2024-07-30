@@ -97,7 +97,11 @@
 (defn killer-gen
   "A mix of kills, restarts, revivals, and reclusterings"
   [test]
-   (gen/mix (killer-gen-seq test)))
+   (let [disrupts (killer-gen-seq test)]
+     (info "(killer-gen-seq) returned: [" (take 5 disrupts) "..]")
+     disrupts
+    )
+)
 
 (defn full-nemesis
   "Handles kills, restarts, revives, reclusters, clock skew, and partitions."
