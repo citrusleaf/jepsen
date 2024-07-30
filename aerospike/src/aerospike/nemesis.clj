@@ -134,7 +134,7 @@
   (let [dead (atom #{})
         opts (assoc opts :dead dead)]
     {:nemesis (full-nemesis opts)
-     :generator (full-gen opts)
+     :generator (killer-gen-seq opts)
      :final-generator (gen/concat
                         (gen/once {:type :info, :f :partition-stop})
                         (gen/once {:type :info, :f :clock-reset})
