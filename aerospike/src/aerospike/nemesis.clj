@@ -89,7 +89,7 @@
                          [revive-gen recluster-gen])]
                       (remove nil?)
                       vec)]
-    (debug patterns)
+    (info "Kill-Seq::PATTERNS=>" patterns)
     (mapcat rand-nth (repeat patterns))))
 
 (defn killer-gen
