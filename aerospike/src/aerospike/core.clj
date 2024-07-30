@@ -76,8 +76,8 @@
                                 (gen/sleep 10)
                                 (gen/clients final-generator)))]
     (info "constructed jepsen test-map!")
-    ;; (info "jepsen test total generator's first's first's first>")
-    ;; (info (first (first (first generator))))
+    (info "jepsen test total generator's first's first's first>")
+    (info (first (first (first generator))))
     ;; ;; (info (gen/op (first (first generator))))
     
   (merge tests/noop-test
