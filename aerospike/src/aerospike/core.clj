@@ -76,10 +76,10 @@
                                 (gen/sleep 10)
                                 (gen/clients final-generator)))]
     (info "constructed jepsen test-map!")
-    (info "jepsen test total generator's first's first's first>")
-    (info (first (first (first generator))))
-    ;; (info (gen/op (first (first generator))))
-    )
+    ;; (info "jepsen test total generator's first's first's first>")
+    ;; (info (first (first (first generator))))
+    ;; ;; (info (gen/op (first (first generator))))
+    
   (merge tests/noop-test
          opts
          {:name     (str "aerospike " (name (:workload opts)))
@@ -91,7 +91,9 @@
           :checker  (checker/compose
                      {:perf (checker/perf)
                       :workload checker})
-          :model    model})))
+          :model    model})
+  )
+)
 
 (def opt-spec
   "Additional command-line options"
