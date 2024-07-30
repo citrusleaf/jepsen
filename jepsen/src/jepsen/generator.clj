@@ -592,7 +592,7 @@
     ;(binding [*print-length* 3] (prn :op this))
     (when (seq this) ; Once we're out of generators, we're done
       (let [gen (first this)]
-        (info "UNIQUE IDENTIFIER -- in (Generator/op) call")
+        ;; (info "UNIQUE IDENTIFIER -- in (Generator/op) call")
         (if-let [[op gen'] (op gen test ctx)]
           ; OK, our first gen has an op for us. If there's something following
           ; us, we generate a cons cell as our resulting generator; otherwise,
