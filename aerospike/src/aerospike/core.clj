@@ -61,11 +61,11 @@
         time-limit (:time-limit opts)
         generator (->> generator
                        (gen/nemesis
-                         (->> (:generator nemesis)
-                              (gen/delay (if (= :pause (:workload opts))
-                                           0 ; The pause workload has its own
+                        (->> (:generator nemesis)
+                             (gen/delay (if (= :pause (:workload opts))
+                                          0 ; The pause workload has its own
                                              ; schedule
-                                           (:nemesis-interval opts)))))
+                                          (:nemesis-interval opts)))))
                        (gen/time-limit (:time-limit opts)))
         generator (if-not (or final-generator (:final-generator nemesis))
                     generator
@@ -77,19 +77,21 @@
                                 (gen/clients final-generator)))]
     (info "constructed jepsen test-map!")
     (info "jepsen test total generator's first's first's first>")
-    (info (first (first (first generator)))))
-    (merge tests/noop-test
-           opts
-           {:name     (str "aerospike " (name (:workload opts)))
-            :os       debian/os
-            :db       (support/db opts)
-            :client   client
-            :nemesis  (:nemesis nemesis)
-            :generator generator
-            :checker  (checker/compose
-                      {:perf (checker/perf)
-                       :workload checker})
-            :model    model})))
+    (info (first (first (first generator))))
+    (info (op (first (first generator))))
+    )
+  (merge tests/noop-test
+         opts
+         {:name     (str "aerospike " (name (:workload opts)))
+          :os       debian/os
+          :db       (support/db opts)
+          :client   client
+          :nemesis  (:nemesis nemesis)
+          :generator generator
+          :checker  (checker/compose
+                     {:perf (checker/perf)
+                      :workload checker})
+          :model    model})))
 
 (def opt-spec
   "Additional command-line options"
