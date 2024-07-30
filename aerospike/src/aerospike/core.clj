@@ -41,6 +41,7 @@
 (defn workload+nemesis
   "Finds the workload and nemesis for a given set of parsed CLI options."
   [opts]
+  (info "in call to (workload+nemesis [opts])")
   (case (:workload opts)
     :pause (pause/workload+nemesis opts)
 

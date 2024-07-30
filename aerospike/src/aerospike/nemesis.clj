@@ -82,6 +82,7 @@
 (defn killer-gen-seq
   "Sequence of kills, restarts, revivals, and reclusterings"
   [test]
+  (info "in (killer-gen-seq [test]) cal")
   (let [patterns (->> [[kill-gen]
                        [restart-gen]
                        ; Revive then recluster
@@ -133,6 +134,7 @@
 
   :max-dead-nodes   number of nodes allowed to be down simultaneously"
   [opts]
+  (info "Instantiating Full-Nemesis")
   (let [dead (atom #{})
         opts (assoc opts :dead dead)]
     {:nemesis (full-nemesis opts)
