@@ -92,7 +92,7 @@
                       (remove nil?)
                       vec)]
     (info "Kill-Seq::PATTERNS=>" patterns)
-    (mapcat rand-nth (repeat patterns))))
+    (cycle patterns)))
 
 (defn killer-gen
   "A mix of kills, restarts, revivals, and reclusterings"
