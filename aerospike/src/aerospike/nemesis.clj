@@ -83,15 +83,15 @@
   "Sequence of kills, restarts, revivals, and reclusterings"
   [test]
   (info "in (killer-gen-seq [test]) call")
-  (let [patterns (->> [[kill-gen]
-                       [restart-gen]
+  (let [patterns (->> [[(kill-gen)]
+                       [(restart-gen)]
                        ; Revive then recluster
                        (when-not (:no-revives test)
-                         [revive-gen recluster-gen])]
+                         [(revive-gen) (recluster-gen)])]
                       (remove nil?)
                       vec)]
     (info "Kill-Seq::PATTERNS=>" patterns)
-    (cycle patterns)))
+    (mapcat rand-nth (repeat patterns))))
 
 (defn killer-gen
   "A mix of kills, restarts, revivals, and reclusterings"
