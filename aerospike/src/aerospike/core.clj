@@ -76,8 +76,7 @@
                                 (gen/sleep 10)
                                 (gen/clients final-generator)))]
     (info "constructed jepsen test-map!")
-    (info "jepsen test total generator's first's first's first>")
-    (info "test.generator's `gen` is a"(type generator))
+    (info "test.generator's `gen[0][0]` is a"(type (first (first generator))))
     ;; ;; (info (gen/op (first (first generator))))
     
   (merge tests/noop-test
