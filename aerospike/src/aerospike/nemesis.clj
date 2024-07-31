@@ -91,7 +91,7 @@
                       (remove nil?)
                       vec)]
     (info "Kill-Seq::PATTERNS=>" patterns)
-    (mapcat rand-nth (repeat patterns))))
+    (mapcat rand-nth (repeat 960 patterns))))
 
 (defn killer-gen
   "A mix of kills, restarts, revivals, and reclusterings"
@@ -99,9 +99,10 @@
   (let [disrupts (killer-gen-seq test)]
     (info "(killer-gen-seq) returned: [" (take 5 disrupts) "..]")
     ;; (info "(once disrupts): [" (gen/once disrupts) "..]")
-    ;; (gen/once disrupts)
-    (take 120 disrupts)
-  )
+    ;; (info "as sequence..:"(seq disrupts))
+    (gen/mix (seq disrupts))
+    ;; [(take 120 disrupts)]
+    )
 )
 
 (defn full-nemesis
