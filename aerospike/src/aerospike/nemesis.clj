@@ -5,8 +5,7 @@
                     [generator :as gen]
                     [nemesis :as nemesis]
                     [util :refer [meh random-nonempty-subset]]]
-            [jepsen.nemesis.time :as nt]
-            [jepsen.generator.pure :as gen]))
+            [jepsen.nemesis.time :as nt]))
 
 ; Nemeses
 
