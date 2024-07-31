@@ -6,7 +6,7 @@
                     [nemesis :as nemesis]
                     [util :refer [meh random-nonempty-subset]]]
             [jepsen.nemesis.time :as nt]
-            [jepsen.generator :as gen]))
+            [jepsen.generator.pure :refer [once]]))
 
 ; Nemeses
 
@@ -99,7 +99,7 @@
   [test]
    (let [disrupts (killer-gen-seq test)]
      (info "(killer-gen-seq) returned: [" (take 5 disrupts) "..]")
-     disrupts
+     (once disrupts)
     )
 )
 
