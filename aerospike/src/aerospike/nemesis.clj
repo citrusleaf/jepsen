@@ -98,7 +98,7 @@
   [test]
    (let [disrupts (killer-gen-seq test)]
      (info "(killer-gen-seq) returned: [" (take 5 disrupts) "..]")
-     (gen/once disrupts)
+     (gen/limit 100 disrupts)
     )
 )
 
