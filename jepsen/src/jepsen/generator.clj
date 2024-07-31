@@ -1164,7 +1164,7 @@
         ; Good, we have an op
          (let [idx (rand-int (count gens))]
            (if (not (= op :pending))
-              (info "i=" i "using index" idx "--> op:= " op "\n--Gen'[0] :=" (take 1 gen')) 
+              (info "i=" i  "; using index" idx "of" (count gens) "--> op:= " op "\n--Gen'[0] :=" (take 1 gen')) 
               nil
             )
           [op (Mix. idx (assoc gens i gen'))]
