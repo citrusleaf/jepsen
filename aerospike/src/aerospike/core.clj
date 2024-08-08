@@ -127,7 +127,20 @@
    [nil "--heartbeat-interval MS" "Aerospike heartbeat interval in milliseconds"
     :default 150
     :parse-fn #(Long/parseLong %)
-    :validate [pos? "must be positive"]]])
+    :validate [pos? "must be positive"]]
+   [nil "--max-txn-length MAX" "Maximum number of micro-ops per transaction"
+    :default 2
+    :parse-fn #(Long/parseLong %)
+    :validate [pos? "must be positive"]
+              ; TODO: must be >= min-txn-length
+    ]
+   [nil "--min-txn-length MIN" "Maximum number of micro-ops per transaction"
+    :default 2
+    :parse-fn #(Long/parseLong %)
+    :validate [pos? "must be positive"]
+              ; TODO: must be <= min-txn-length
+    ]
+   ])
 
 (defn -main
   "Handles command-line arguments, running a Jepsen command."
