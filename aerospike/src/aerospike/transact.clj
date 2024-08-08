@@ -92,7 +92,26 @@
    :generator (rw/gen {:key-dist :uniform, :key-count 3})})
 
 
-(defn workload-ListAppend []
+(defn workload-ListAppend 
+  ([]
+   (workload-ListAppend {})
+  ;; {:client (TranClient. nil s/ans "vals")
+  ;;  :checker (la/checker)
+  ;;  :generator (la/gen {:key-dist :uniform, :key-count 3})}
+  )
+  ([opts]
+   {:client (TranClient. nil s/ans "vals")
+    :checker (la/checker)
+    :generator (la/gen 
+                {:key-dist        (:key-dist opts :uniform), 
+                 :key-count       (:key-count opts 3)
+                 :min-txn-length  (:min-txn-length opts 1)
+                 :max-txn-length  (:max-txn-length opts 3)
+                 })}
+   )
+)
+
+(defn workload-Tunable [opts]
   {:client (TranClient. nil s/ans "vals")
    :checker (la/checker)
-   :generator (la/gen {:key-dist :uniform, :key-count 3})})
+   :generator (la/gen opts)})

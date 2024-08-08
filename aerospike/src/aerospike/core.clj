@@ -27,13 +27,16 @@
 
   Or, for some special cases where nemeses and workloads are coupled, we return
   a keyword here instead."
-  []
+  ([]
+  (workloads {})) 
+  ([opts]
   {:cas-register (cas-register/workload)
    :counter      (counter/workload)
    :set          (set/workload)
    :transact     (transact/workload)
-   :list-append  (transact/workload-ListAppend)
-   :pause        :pause}) ; special case
+   :list-append  (transact/workload-ListAppend opts)
+   :pause        :pause}); special case
+)
 
 (defn workload+nemesis
   "Finds the workload and nemesis for a given set of parsed CLI options."
@@ -41,7 +44,7 @@
   (case (:workload opts)
     :pause (pause/workload+nemesis opts)
 
-    {:workload (get (workloads) (:workload opts))
+    {:workload (get (workloads opts) (:workload opts))
      :nemesis  (nemesis/full opts)}))
 
 (defn aerospike-test
