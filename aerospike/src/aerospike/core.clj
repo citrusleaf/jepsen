@@ -148,7 +148,7 @@
    [nil "--key-dist DIST" "Uniform or Exponential"
     :default  :exponential 
     :parse-fn keyword
-    :validate [cli/one-of #{:uniform :exponential} ]]
+    :validate [#{:uniform :exponential} (cli/one-of #{:uniform :exponential}) ]]
    ])
 
 (defn -main
