@@ -11,7 +11,8 @@
   (:import (com.aerospike.client Txn
                                  AerospikeException
                                  AerospikeException$Commit
-                                 CommitError)))
+                                 CommitError
+                                 CommitStatus)))
 
 
 (def txn-set "Set Name for Txn Test" "entries")
@@ -49,7 +50,8 @@
     (if (= (:f op) :txn)
       (s/with-errors op #{}
         (let [tid (Txn.)
-              txn' (atom nil)]
+              txn' (atom nil)
+              cs (atom nil)]
           (try
             (let [;; wp (txn-wp tid)
                   txn (:value op)
@@ -58,16 +60,17 @@
            ;; (info "TRANSACTION!" tid "begin")
            ;; (mapv (partial mop! client wp) txn)
               (info "Txn: " (.getId tid) " ..OKAY!")
-              (.commit client tid)
+              (reset! cs (.commit client tid))
+              (info cs)
               (info "COMMITED!")
               (assoc op :type :ok :value @txn'))
            ;; (info  op)
-            (catch AerospikeException$Commit e#
-              (info "Encountered Commit Error! " (.getResultCode e#) (.getMessage e#))
-              (if (or (= (.error e#) CommitError/ROLL_FORWARD_ABANDONED)
-                      (= (.error e#) CommitError/CLOSE_ABANDONED))
-                (do (info "COMMITS EVENTUALLY") (assoc op :type :ok, :value @txn'))
-                (do (info "FAILURE COMMITTING") (assoc op :type :fail, :error :commit))))
+            ;; (catch AerospikeException$Commit e#
+            ;;   (info "Encountered Commit Error! " (.getResultCode e#) (.getMessage e#))
+            ;;   (if (or (= (.error e#) CommitError/ROLL_FORWARD_ABANDONED)
+            ;;           (= (.error e#) CommitError/CLOSE_ABANDONED))
+            ;;     (do (info "COMMITS EVENTUALLY") (assoc op :type :ok, :value @txn'))
+            ;;     (do (info "FAILURE COMMITTING") (assoc op :type :fail, :error :commit))))
             (catch AerospikeException e#
               (info "Exception caught:" (.getResultCode e#) (.getMessage e#))
               (info "Aborting..")
