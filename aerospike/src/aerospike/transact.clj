@@ -61,11 +61,16 @@
            ;; (mapv (partial mop! client wp) txn)
               (info "Txn: " (.getId tid) " ..DONE!")
               (reset! cs (.commit client tid))
-              (info "OKAY? "(= @cs CommitStatus/OK))
-              (info @cs)
-              (info "for ref:" CommitStatus/OK)
-              (info "COMMITED!")
-              (assoc op :type :ok :value @txn'))
+
+              (if (= @cs CommitStatus/OK) 
+                (assoc op :type :ok :value @txn') 
+                (assoc op :type :fail, :error :commit)))
+
+              ;; (info "OKAY? " (= @cs CommitStatus/OK))
+              ;; (info @cs)
+              ;; (info "for ref:" CommitStatus/OK)
+              ;; (info "COMMITED!")
+              ;; (assoc op :type :ok :value @txn'))
            ;; (info  op)
             (catch AerospikeException$Commit e#
               (info "Encountered Commit Error! " (.getResultCode e#) (.getMessage e#))
