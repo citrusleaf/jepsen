@@ -11,7 +11,7 @@
   (:import (com.aerospike.client Txn
                                  AerospikeException
                                  AerospikeException$Commit
-                                 CommitError
+                                ;;  CommitError
                                  CommitStatus)))
 
 
@@ -62,17 +62,17 @@
               (info "Txn: " (.getId tid) " ..DONE!")
               (reset! cs (.commit client tid))
               (info "OKAY? "(= cs CommitStatus/OK))
-              (info (.getMessage cs))
+              (info cs)
               (info "COMMITED!")
               (assoc op :type :ok :value @txn'))
            ;; (info  op)
             (catch AerospikeException$Commit e#
               (info "Encountered Commit Error! " (.getResultCode e#) (.getMessage e#))
-              (throw e#))
+              ;; (throw e#))
             ;;   (if (or (= (.error e#) CommitError/ROLL_FORWARD_ABANDONED)
             ;;           (= (.error e#) CommitError/CLOSE_ABANDONED))
             ;;     (do (info "COMMITS EVENTUALLY") (assoc op :type :ok, :value @txn'))
-            ;;     (do (info "FAILURE COMMITTING") (assoc op :type :fail, :error :commit))))
+                (do (info "FAILURE COMMITTING") (assoc op :type :fail, :error :commit)))
             (catch AerospikeException e#
               (info "Exception caught:" (.getResultCode e#) (.getMessage e#))
               (info "Aborting..")
