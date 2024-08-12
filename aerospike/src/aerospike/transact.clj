@@ -61,12 +61,14 @@
            ;; (mapv (partial mop! client wp) txn)
               (info "Txn: " (.getId tid) " ..OKAY!")
               (reset! cs (.commit client tid))
-              (info cs)
+              (info (= cs CommitStatus/OK))
+              (info (.getMessage cs))
               (info "COMMITED!")
               (assoc op :type :ok :value @txn'))
            ;; (info  op)
-            ;; (catch AerospikeException$Commit e#
-            ;;   (info "Encountered Commit Error! " (.getResultCode e#) (.getMessage e#))
+            (catch AerospikeException$Commit e#
+              (info "Encountered Commit Error! " (.getResultCode e#) (.getMessage e#))
+              (throw e#))
             ;;   (if (or (= (.error e#) CommitError/ROLL_FORWARD_ABANDONED)
             ;;           (= (.error e#) CommitError/CLOSE_ABANDONED))
             ;;     (do (info "COMMITS EVENTUALLY") (assoc op :type :ok, :value @txn'))
