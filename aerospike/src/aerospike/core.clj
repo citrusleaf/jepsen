@@ -148,7 +148,7 @@
    [nil "--key-dist DIST" "Uniform or Exponential"
     :default  10 ; TODO: make this  default differently based on key-dist 
     :parse-fn keyword
-    :validate [pos? "must be positive"]]
+    :validate [cli/one-of ["uniform" "exponential"]]]
    ])
 
 (defn -main
