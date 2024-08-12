@@ -61,7 +61,7 @@
            ;; (mapv (partial mop! client wp) txn)
               (info "Txn: " (.getId tid) " ..DONE!")
               (reset! cs (.commit client tid))
-              (info "OKAY? "(= (@cs) CommitStatus/OK))
+              (info "OKAY? "(= @cs CommitStatus/OK))
               (info @cs)
               (info "for ref:" CommitStatus/OK)
               (info "COMMITED!")
