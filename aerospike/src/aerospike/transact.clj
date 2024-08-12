@@ -62,6 +62,7 @@
               (info "Txn: " (.getId tid) " ..DONE!")
               (reset! cs (.commit client tid))
               (info "OKAY? "(= (:val cs) CommitStatus/OK))
+              (info cs)
               (info (:val cs))
               (info "for ref:" CommitStatus/OK)
               (info "COMMITED!")
