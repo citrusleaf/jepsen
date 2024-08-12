@@ -62,7 +62,8 @@
               (info "Txn: " (.getId tid) " ..DONE!")
               (reset! cs (.commit client tid))
 
-              (if (= @cs CommitStatus/OK) 
+              (if (or (= @cs CommitStatus/OK) 
+                      (= @cs CommitStatus/ROLL_FORWARD_ABANDONED))
                 (assoc op :type :ok :value @txn') 
                 (assoc op :type :fail, :error :commit)))
 
