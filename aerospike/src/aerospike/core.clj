@@ -140,6 +140,15 @@
     :validate [pos? "must be positive"]
               ; TODO: must be <= min-txn-length
     ]
+   [nil "--key-count N_KEYS" "Number of active keys at any given time"
+    :default  3 ; TODO: make this  default differently based on key-dist 
+    :parse-fn #(Long/parseLong %)
+    :validate [pos? "must be positive"]
+   ]
+   [nil "--key-dist DIST" "Uniform or Exponential"
+    :default  10 ; TODO: make this  default differently based on key-dist 
+    :parse-fn #(Long/parseLong %)
+    :validate [pos? "must be positive"]]
    ])
 
 (defn -main
