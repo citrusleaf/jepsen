@@ -147,7 +147,7 @@
    ]
    [nil "--key-dist DIST" "Uniform or Exponential"
     :default  10 ; TODO: make this  default differently based on key-dist 
-    :parse-fn #(Long/parseLong %)
+    :parse-fn keyword
     :validate [pos? "must be positive"]]
    ])
 
