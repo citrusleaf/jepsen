@@ -53,12 +53,10 @@
               txn' (atom nil)
               cs (atom nil)]
           (try
-            (let [;; wp (txn-wp tid)
-                  txn (:value op)
+            (let [txn (:value op)
                   txn-res (mapv (partial mop! client tid) txn)]
               (reset! txn' txn-res)
            ;; (info "TRANSACTION!" tid "begin")
-           ;; (mapv (partial mop! client wp) txn)
               (info "Txn: " (.getId tid) " ..DONE!")
               (reset! cs (.commit client tid))
 
@@ -66,19 +64,8 @@
                       (= @cs CommitStatus/ROLL_FORWARD_ABANDONED))
                 (assoc op :type :ok :value @txn') 
                 (assoc op :type :fail, :error :commit)))
-
-              ;; (info "OKAY? " (= @cs CommitStatus/OK))
-              ;; (info @cs)
-              ;; (info "for ref:" CommitStatus/OK)
-              ;; (info "COMMITED!")
-              ;; (assoc op :type :ok :value @txn'))
-           ;; (info  op)
             (catch AerospikeException$Commit e#
               (info "Encountered Commit Error! " (.getResultCode e#) (.getMessage e#))
-              ;; (throw e#))
-            ;;   (if (or (= (.error e#) CommitError/ROLL_FORWARD_ABANDONED)
-            ;;           (= (.error e#) CommitError/CLOSE_ABANDONED))
-            ;;     (do (info "COMMITS EVENTUALLY") (assoc op :type :ok, :value @txn'))
                 (do (info "FAILURE COMMITTING") (assoc op :type :fail, :error :commit)))
             (catch AerospikeException e#
               (info "Exception caught:" (.getResultCode e#) (.getMessage e#))
@@ -92,7 +79,8 @@
                      (info "CAUGHT CODE 30 in TranClient.invoke --> ABORTING " (:value op))
                      (assoc op :type :fail, :error :read-verify))
                 (throw e#))))))
-      (info "REGULAR OP!")))
+      (info "REGULAR OP!")  ; Should never happen with txn test workloads 
+    ))
   (teardown! [_ test])
   (close! [this test]
     (s/close client)))
@@ -106,11 +94,7 @@
 
 (defn workload-ListAppend 
   ([]
-   (workload-ListAppend {})
-  ;; {:client (TranClient. nil s/ans "vals")
-  ;;  :checker (la/checker)
-  ;;  :generator (la/gen {:key-dist :uniform, :key-count 3})}
-  )
+   (workload-ListAppend {}))
   ([opts]
    {:client (TranClient. nil s/ans "vals")
     :checker (la/checker)
@@ -119,11 +103,5 @@
                  :key-count       (:key-count opts 3)
                  :min-txn-length  (:min-txn-length opts 1)
                  :max-txn-length  (:max-txn-length opts 3)
-                 })}
-   )
+                 })})
 )
-
-(defn workload-Tunable [opts]
-  {:client (TranClient. nil s/ans "vals")
-   :checker (la/checker)
-   :generator (la/gen opts)})
