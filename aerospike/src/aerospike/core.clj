@@ -6,7 +6,6 @@
                        [nemesis :as nemesis]
                        [pause :as pause]
                        [set :as set]
-                       [transact :as transact]
             ]
             [clojure.tools.logging :refer [debug info warn]]
             [jepsen [cli :as cli]
@@ -33,8 +32,6 @@
   {:cas-register (cas-register/workload)
    :counter      (counter/workload)
    :set          (set/workload)
-   :transact     (transact/workload)
-   :list-append  (transact/workload-ListAppend opts)
    :pause        :pause}); special case
 )
 
