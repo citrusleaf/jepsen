@@ -6,7 +6,7 @@
                        [nemesis :as nemesis]
                        [pause :as pause]
                        [set :as set]
-                       [transact :as transact]
+                      ;;  [transact :as transact]
             ]
             [clojure.tools.logging :refer [debug info warn]]
             [jepsen [cli :as cli]
@@ -30,12 +30,19 @@
   ([]
   (workloads {})) 
   ([opts]
-  {:cas-register (cas-register/workload)
-   :counter      (counter/workload)
-   :set          (set/workload)
-   :transact     (transact/workload)
-   :list-append  (transact/workload-ListAppend opts)
-   :pause        :pause}); special case
+   (let [res {:cas-register (cas-register/workload)
+            :counter      (counter/workload)
+            :set          (set/workload)
+  ;;  :transact     (transact/workload)
+  ;;  :list-append  (transact/workload-ListAppend opts)
+            :pause        :pause}]
+       (when (= (System/getenv "JAVA_CLIENT_REF") "CLIENT-2848")
+         (do (require '[aerospike.transact :as transact])
+             (assoc res 
+                    :transact (transact/workload) 
+                    :list-append (transact/workload-ListAppend))
+             res))
+   )); special case
 )
 
 (defn workload+nemesis
