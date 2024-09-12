@@ -5,9 +5,7 @@
                        [cas-register :as cas-register]
                        [nemesis :as nemesis]
                        [pause :as pause]
-                       [set :as set]
-                      ;;  [transact :as transact]
-            ]
+                       [set :as set]]
             [clojure.tools.logging :refer [debug info warn]]
             [jepsen [cli :as cli]
                     [checker :as checker]
@@ -31,19 +29,17 @@
   (workloads {})) 
   ([opts]
    (let [res {:cas-register (cas-register/workload)
-            :counter      (counter/workload)
-            :set          (set/workload)
-  ;;  :transact     (transact/workload)
-  ;;  :list-append  (transact/workload-ListAppend opts)
-            :pause        :pause}]
-       (when (= (System/getenv "JAVA_CLIENT_REF") "CLIENT-2848")
-         (do (require '[aerospike.transact :as transact])
-             (assoc res 
-                    :transact (transact/workload) 
-                    :list-append (transact/workload-ListAppend))
-             res))
-   )); special case
-)
+              :counter      (counter/workload)
+              :set          (set/workload)
+              :pause        :pause}]
+     (if (= (System/getenv "JAVA_CLIENT_REF") "CLIENT-2848")
+       (do (require '[aerospike.transact :as transact]) ; for alias only(?)
+          ;; add MRT workloads iff client branch supports it
+           (assoc res
+                  :transact ((requiring-resolve 'transact/workload))
+                  :list-append ((requiring-resolve 'transact/workload-ListAppend) opts)))
+       ;; otherwise, return SRT workloads only
+       res))))
 
 (defn workload+nemesis
   "Finds the workload and nemesis for a given set of parsed CLI options."
