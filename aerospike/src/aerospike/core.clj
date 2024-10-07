@@ -167,11 +167,21 @@
 ;;                    (cli/serve-cmd))
 ;;             args))
 
+(defn all-test-opts
+  ""
+  []
+  (workloads))
 
-(defn noop-test [opts]
-  (merge tests/noop-test
-         {:pure-generators true}
-         {:name     (str "aerospike set")}))
+(defn all-tests
+  "Takes base CLI options and constructs a sequence of test options."
+  [opts]
+  (info "Constructing -all-tests- map! from options:" opts)
+  (map aerospike-test '({:workload set 
+                         :nemesis-interval 8
+                         :time-limit 32} 
+                        {:workload counter 
+                         :nemesis-interval 8
+                         :time-limit 32})))
 
 (defn -main
   "Handles command-line arguments, running a Jepsen command."
@@ -181,6 +191,6 @@
            {:test-fn   aerospike-test
             :opt-spec  opt-spec})
           (cli/test-all-cmd
-           {:test-fn   noop-test
+           {:tests-fn  all-tests
             :opt-spec  opt-spec}))
    args))
