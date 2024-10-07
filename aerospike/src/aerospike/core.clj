@@ -77,7 +77,7 @@
                                 (gen/log "Waiting for quiescence")
                                 (gen/sleep 10)
                                 (gen/clients final-generator)))]
-    (info "constructed jepsen test-map")
+    (info "constructed jepsen test-map from opts:=" opts "\nWith CLIENT:=" client)
     (merge tests/noop-test
            opts
            {:name     (str "aerospike " (name (:workload opts)))
@@ -175,15 +175,25 @@
 (defn all-tests
   "Takes base CLI options and constructs a sequence of test options."
   [opts]
-  (info "Constructing -all-tests- map! from options:" opts)
-  (map aerospike-test '({:workload set 
-                         :nemesis-interval 8
-                         :time-limit 32
-                         :nodes-file "/qe/test/aerospike/hosts"} 
-                        {:workload counter 
-                         :nemesis-interval 8
-                         :time-limit 32
-                         :nodes-file "/qe/test/aerospike/hosts"})))
+  (info "Constructing -all-tests- from map! options:" opts)
+  (let [node-opt (:nodes opts)
+        res (map aerospike-test (cons {:workload "set"
+                                       :nemesis-interval 8
+                                       :time-limit 32
+                                       :ssh {:dummy? false, 
+                                             :username "root", 
+                                             :password "", 
+                                             :strict-host-key-checking false, 
+                                             :private-key-path "/home/root/.ssh/id_rsa"}
+                          ;;  :nodes-file "/qe/test/aerospike/hosts"
+                                       :nodes node-opt} '()))
+                        ;; {:workload counter 
+                        ;;  :nemesis-interval 8
+                        ;;  :time-limit 32
+                        ;;  :nodes-file "/qe/test/aerospike/hosts"}
+        ]
+    ;; (info "Returning" (util/test->str res))
+    res))
 
 (defn -main
   "Handles command-line arguments, running a Jepsen command."
