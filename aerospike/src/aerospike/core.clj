@@ -178,10 +178,12 @@
   (info "Constructing -all-tests- map! from options:" opts)
   (map aerospike-test '({:workload set 
                          :nemesis-interval 8
-                         :time-limit 32} 
+                         :time-limit 32
+                         :nodes-file "/qe/test/aerospike/hosts"} 
                         {:workload counter 
                          :nemesis-interval 8
-                         :time-limit 32})))
+                         :time-limit 32
+                         :nodes-file "/qe/test/aerospike/hosts"})))
 
 (defn -main
   "Handles command-line arguments, running a Jepsen command."
