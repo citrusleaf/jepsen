@@ -12,8 +12,7 @@
              [checker :as checker]
              [generator :as gen]
              [tests :as tests]]
-            [jepsen.os.debian :as debian]
-            [jepsen.cli :as cli])
+            [jepsen.os.debian :as debian])
   (:gen-class))
 
 (def txns-enabled
@@ -92,8 +91,6 @@
                        :workload checker})
             :model    model})))
 
-
-
 (def mrt-opt-spec "Options for Elle-based workloads"
   [[nil "--max-txn-length MAX" "Maximum number of micro-ops per transaction"
     :default 2
@@ -114,9 +111,6 @@
     :parse-fn #(Long/parseLong %)
     :validate [pos? "must be positive"]]
    ])
-
-
-
 
 (def srt-opt-spec
   "Additional command-line options"
@@ -164,7 +158,7 @@
     srt-opt-spec))
 
 
-;; -- Why did we merge in the webserver
+;; -- Why did we merge in the webserver before?
 ;; (defn -main
 ;;   "Handles command-line arguments, running a Jepsen command."
 ;;   [& args]

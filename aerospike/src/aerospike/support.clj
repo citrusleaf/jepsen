@@ -1,33 +1,17 @@
 (ns aerospike.support
   "Core DB setup and support features"
-  (:require 
-            [clojure 
-              [pprint :refer [pprint]]
-              [string :as str]]
-            [clojure.java.io :as io]
-            [clojure.walk :as walk]
-            [clojure.tools.logging :refer [debug info warn]]
-            [dom-top.core :refer [with-retry letr]]
-            [jepsen [core      :as jepsen]
-                    [db        :as db]
-                    [util      :as util :refer [meh timeout]]
-                    [control   :as c :refer [|]]
-                    [client    :as client]
-                    [checker   :as checker]
-                    [generator :as gen]
-                    [independent :as independent]
-                    [nemesis   :as nemesis]
-                    [os        :as os]
-                    [store     :as store]
-                    [tests     :as tests]]
-            [jepsen.checker.timeline :as timeline]
-            [jepsen.nemesis.time :as nt]
-            [jepsen.os.debian :as debian]
-            [knossos.model :as model]
-            [wall.hack]
-            [jepsen.control [net :as net]
-                            [util :as netUtil]]
-  )
+  (:require
+   [clojure [string :as str]]
+   [clojure.java.io :as io]
+   [clojure.tools.logging :refer [debug info warn]]
+   [dom-top.core :refer [with-retry]]
+   [jepsen 
+    [core      :as jepsen]
+    [db        :as db]
+    [util      :as util :refer [meh timeout]]
+    [control   :as c :refer [|]]]
+   [jepsen.nemesis.time :as nt]
+   [jepsen.os.debian :as debian])
 
   (:import
    (clojure.lang ExceptionInfo)
@@ -133,7 +117,7 @@
         (throw e))
       (info "Retrying client creation -" (.getMessage e))
       (Thread/sleep 1000)
-      (retry (dec tries)))))
+      ('retry (dec tries)))))
 
 
 (defn connect
