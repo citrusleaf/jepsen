@@ -6,6 +6,7 @@
              [nemesis :as nemesis]
              [set :as set]]
             [clojure.tools.logging :refer [info]]
+            [clojure.pprint :refer [pprint]]
             [clojure.string :as string]
             [jepsen [cli :as cli]
              [control :as c]
@@ -30,7 +31,7 @@
   Or, for some special cases where nemeses and workloads are coupled, we return
   a keyword here instead."
   ([]
-  (workloads {})) 
+   (workloads {}))
   ([opts]
    (let [res {:cas-register (cas-register/workload)
               :counter      (counter/workload)
@@ -39,7 +40,7 @@
        (do (require '[aerospike.transact :as transact]) ; for alias only(?)
           ;; add MRT workloads iff client branch supports it
            (assoc res
-                  :transact ((requiring-resolve 'transact/workload))
+                  :transact ((requiring-resolve 'transact/workload) opts)
                   :list-append ((requiring-resolve 'transact/workload-ListAppend) opts)))
        ;; otherwise, return SRT workloads only
        res))))
@@ -47,6 +48,7 @@
 (defn workload+nemesis
   "Finds the workload and nemesis for a given set of parsed CLI options."
   [opts]
+  (info "In Call to (workload+nemesis) with opts: " opts)
   (case (:workload opts)
     {:workload (get (workloads opts) (:workload opts))
      :nemesis  (nemesis/full opts)}))
@@ -63,11 +65,11 @@
         time-limit (:time-limit opts)
         generator (->> generator
                        (gen/nemesis
-                         (->> (:generator nemesis)
-                              (gen/delay (if (= :pause (:workload opts))
-                                           0 ; The pause workload has its own
+                        (->> (:generator nemesis)
+                             (gen/delay (if (= :pause (:workload opts))
+                                          0 ; The pause workload has its own
                                              ; schedule
-                                           (:nemesis-interval opts)))))
+                                          (:nemesis-interval opts)))))
                        (gen/time-limit (:time-limit opts)))
         generator (if-not (or final-generator (:final-generator nemesis))
                     generator
@@ -87,8 +89,8 @@
             :nemesis  (:nemesis nemesis)
             :generator generator
             :checker  (checker/compose
-                      {:perf (checker/perf)
-                       :workload checker})
+                       {:perf (checker/perf)
+                        :workload checker})
             :model    model})))
 
 (def mrt-opt-spec "Options for Elle-based workloads"
@@ -109,18 +111,15 @@
    [nil "--max-writes-per-key N_WRITES" "Limit of writes to a particular key"
     :default  32 ; TODO: make this  default differently based on key-dist 
     :parse-fn #(Long/parseLong %)
-    :validate [pos? "must be positive"]]
-   ])
+    :validate [pos? "must be positive"]]])
 
 (def srt-opt-spec
   "Additional command-line options"
-  [
-   [nil "--workload WORKLOAD" "Test workload to run"
+  [[nil "--workload WORKLOAD" "Test workload to run"
     :parse-fn keyword
     :default :all
     :missing (str "--workload " (cli/one-of (workloads)))
-    :validate [(assoc (workloads) :all "all") (cli/one-of (assoc (workloads) :all "all"))]
-    ]
+    :validate [(assoc (workloads) :all "all") (cli/one-of (assoc (workloads) :all "all"))]]
    [nil "--max-dead-nodes NUMBER" "Number of nodes that can simultaneously fail"
     :parse-fn #(Long/parseLong %)
     :default  2
@@ -149,14 +148,43 @@
    [nil "--heartbeat-interval MS" "Aerospike heartbeat interval in milliseconds"
     :default 150
     :parse-fn #(Long/parseLong %)
-    :validate [pos? "must be positive"]]
-  ])
+    :validate [pos? "must be positive"]]])
 
 (def opt-spec
   (if txns-enabled
     (cli/merge-opt-specs srt-opt-spec mrt-opt-spec)
     srt-opt-spec))
 
+
+(defn valid-opts
+  "returns a map with valid choices for each test option."
+  [opts]
+  (let [txn-min-ops        (rand-nth (range 1 6))
+        key-dist           (rand-nth (list :exponential :uniform))
+        nKeys              (if (= key-dist :uniform)
+                             (rand-nth (range 3 8))
+                             (rand-nth (range 8 12)))
+        cluster-size       (count (:nodes opts))
+        nClients           (if (= (:workload opts) :set)
+                             (rand-nth (list 10 30 60))
+                             (rand-nth (distinct (list
+                                                  1 2 3 5 8 10 30
+                                                  cluster-size
+                                                  (* cluster-size 2)
+                                                  (* cluster-size 3)))))]
+    {:concurrency          nClients
+     ; Txn Specific
+     :min-txn-length       txn-min-ops
+     :max-txn-length       (rand-nth (range txn-min-ops 12))
+     :key-count            nKeys
+     :key-dist             key-dist
+     ; Nemesis related
+     :no-kills             (rand-nth (list true false))
+     :clean-kills          (rand-nth (list true false))
+     :no-partitions        (rand-nth (list true false))
+     :no-clocks            (rand-nth (list true false))
+     :no-revives           (rand-nth (list true false))
+     :nemesis-interval     (rand-nth (list 5 8 10 15 20))}))
 
 ;; -- Why did we merge in the webserver before?
 ;; (defn -main
@@ -168,31 +196,33 @@
 ;;             args))
 
 (defn all-test-opts
-  ""
-  []
-  (workloads))
+  "Creates a list of valid maps for each to be passed to `aerospike-test`"
+  [opts]
+  (info "making option map for (all-tests)'s call to `aerospike-test` with options\n"
+        (with-out-str (pprint opts)))
+  (let [node-opt (:nodes opts)
+        nClients (:concurrency opts)
+        duration (:time-limit opts)
+        ssh-opts (:ssh opts)
+        ;; _ (info "OPT-WRKLD:" (get (workloads opts) (:workload opts)))
+        base-opts (valid-opts opts)]
+    (info "VALIDATED OPTION MAP: " base-opts)
+    (list
+     (merge base-opts opts {:workload :set})
+     (merge base-opts opts {:workload :counter})
+     (merge base-opts opts {:workload :cas-register})
+     (merge base-opts opts {:workload :list-append})
+     (merge base-opts opts {:workload :rw-register}))))
 
 (defn all-tests
-  "Takes base CLI options and constructs a sequence of test options."
+  "
+  Takes base CLI options and constructs a sequence of test option maps to be used with test-all-cmd.
+  "
   [opts]
-  (info "Constructing -all-tests- from map! options:" opts)
-  (let [node-opt (:nodes opts)
-        res (map aerospike-test (cons {:workload "set"
-                                       :nemesis-interval 8
-                                       :time-limit 32
-                                       :ssh {:dummy? false, 
-                                             :username "root", 
-                                             :password "", 
-                                             :strict-host-key-checking false, 
-                                             :private-key-path "/home/root/.ssh/id_rsa"}
-                          ;;  :nodes-file "/qe/test/aerospike/hosts"
-                                       :nodes node-opt} '()))
-                        ;; {:workload counter 
-                        ;;  :nemesis-interval 8
-                        ;;  :time-limit 32
-                        ;;  :nodes-file "/qe/test/aerospike/hosts"}
-        ]
-    ;; (info "Returning" (util/test->str res))
+  ;; (info "Constructing -all-tests- from map! options:" (with-out-str (pprint opts)))
+  (let [res (map aerospike-test (all-test-opts opts))]
+    ;; (info "Returning from (all-tests)") 
+    ;; (info (:workload (first res)))
     res))
 
 (defn -main

@@ -186,6 +186,12 @@
    (c/exec :asinfo :-v 
            (str "set-config:context=namespace;id=" namespace ";strong-consistency-allow-expunge=true"))))
 
+(defn clear-data!
+  [namespace]
+  (c/trace (c/su (c/exec 
+        :asinfo :-v (str "truncate-namespace:namespace=" namespace)))))
+
+
 ;;; asinfo utilities:
 (defmacro poll
   "Calls `expr` repeatedly, binding the result to `sym`, and evaluating `pred`
@@ -292,7 +298,7 @@
   (info "Configuring...")
 ;; Bob owns the initial static config file - but diff may result in expected failures
   (c/su
-    ; Config file
+    ; Copy test data's Config & Feature-Key files
       (c/exec :cp "/data/aerospike_a/etc/aerospike/aerospike.conf" "/etc/aerospike/aerospike.conf")
       (c/exec :cp "/data/aerospike_a/etc/aerospike/features.conf" "/etc/aerospike/features.conf")
    )
@@ -316,7 +322,8 @@
         (asinfo-roster-set! ans (wait-for-all-nodes-observed conn test ans))
         (allow-expunge! ans)
         (wait-for-all-nodes-pending conn test ans)
-        (asadm-recluster!))
+        (asadm-recluster!)
+        (clear-data! "test"))
 
       (jepsen/synchronize test)
       (wait-for-all-nodes-active conn test ans)
@@ -349,8 +356,8 @@
 
 ;;; Test:
 (defn db
-  [opts]
   "Aerospike for a particular version."
+  [opts]
   (info "CREATING DB")
   (reify db/DB
     (setup! [_ test node]
@@ -366,8 +373,10 @@
 
     ;; Bob will teardown
     (teardown! [_ test node]
-      ;; (debian/uninstall! ["aerospike-server-*" "aerospike-tools"])
-      )
+               (info "IN db/teardown! CALL!") 
+              ;; (clear-data! "test")
+              ;; (debian/uninstall! ["aerospike-server-*" "aerospike-tools"])
+               )
       ;;(wipe! node))
 
     )
