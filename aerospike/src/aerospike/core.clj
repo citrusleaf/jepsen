@@ -212,7 +212,7 @@
      (merge base-opts opts {:workload :counter})
      (merge base-opts opts {:workload :cas-register})
      (merge base-opts opts {:workload :list-append})
-     (merge base-opts opts {:workload :rw-register}))))
+     (merge base-opts opts {:workload :transact}))))
 
 (defn all-tests
   "
