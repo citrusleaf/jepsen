@@ -46,7 +46,7 @@
     (assoc this :client (s/connect node)))
   (setup! [this _] this)
   (invoke! [this test op]
-    (info "Invoking" op)
+    ;; (info "Invoking" op)
     (if (= (:f op) :txn)
       (s/with-modern-errors op
         (let [tid (Txn.)
@@ -57,15 +57,15 @@
                   txn-res (mapv (partial mop! client tid) txn)]
               (reset! txn' txn-res)
            ;; (info "TRANSACTION!" tid "begin")
-              (info "Txn: " (.getId tid) " ..DONE!")
+              ;; (info "Txn: " (.getId tid) " ..DONE!")
               (reset! cs (.commit client tid))
 
               (if (not (= @cs CommitStatus/ALREADY_ATTEMPTED))
                 (assoc op :type :ok :value @txn')
                 (do (info "}> !! DOUBLE-COMMIT !! <{  (" @cs ")") (assoc op :type :fail, :error :commit))))
             (catch AerospikeException e#
-              (info "Exception caught:" (.getResultCode e#) (.getMessage e#))
-              (info "Aborting..")
+              ;; (info "Exception caught:" (.getResultCode e#) (.getMessage e#))
+              ;; (info "Aborting..")
               (.abort client tid)
               (case (.getResultCode e#)
                 29 (assoc op :type :fail, :error :MRT-blocked)
