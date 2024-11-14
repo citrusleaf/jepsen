@@ -8,13 +8,15 @@
             [jepsen.tests.cycle
              [wr :as rw]
              [append :as la]])
-  (:import (com.aerospike.client Txn
+  (:import 
+  ;;  (asx Asx)
+   (com.aerospike.client Txn
                                  AerospikeException
                                  AerospikeException$Commit
                                 ;;  CommitError
                                  CommitStatus)))
 
-
+(def call-get-statistics (atom false))
 (def txn-set "Set Name for Txn Test" "entries")
 
 (defn txn-wp [tid]
@@ -78,9 +80,12 @@
       (info "REGULAR OP!")  ; Should never happen with txn test workloads 
     ))
   (teardown! [_ test])
-  (close! [this test]
-    (s/close client)))
-
+  (close! [this test] 
+          (s/close client) 
+          (when (not @call-get-statistics) 
+            (reset! call-get-statistics true)
+            ;; (info (Asx/getStatistics))
+            )))
 
 (defn workload 
   ([]
