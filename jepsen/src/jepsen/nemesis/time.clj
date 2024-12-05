@@ -191,7 +191,7 @@
                     (repeatedly (fn []
                                   (long (* (rand-nth [-1 1])
                                           ;;  (Math/pow 2 (+ 2 (rand 16)))
-                                           (+ 1 (rand 8000)))))))}))
+                                           (+ 1 (rand 27000)))))))}))
 
 (def bump-gen
   "Randomized clock bump generator targeting a random subsets of nodes."
@@ -209,7 +209,7 @@
      :value (zipmap (select test)
                     (repeatedly (fn []
                                   {:delta (long  ;(Math/pow 2 (+ 2 (rand 16))) 
-                                           (+ 1 (rand 8000)))
+                                           (+ 1 (rand 27000)))
                                    :period (long (Math/pow 2 (rand 10)))
                                    :duration (rand 32)})))}))
 
