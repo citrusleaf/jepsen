@@ -130,15 +130,17 @@
   (let [client (create-client node)]
     ; Wait for connection
     (while (not (.isConnected ^IAerospikeClient client))
+      (info "End of Universe: got back client without a connection -> " client) 
       (Thread/sleep 100))
 
-    ;; (info "CLIENT CONNECTED!")
+    (info "CLIENT CONNECTED!")
     ; Wait for workable ops
     (while (try (server-info (first (nodes client)))
                 false
                 (catch AerospikeException$Timeout e
                   true))
       (Thread/sleep 10))
+    (info "CLIENT READY!")
     client))
 
 ;;; asinfo commands:
