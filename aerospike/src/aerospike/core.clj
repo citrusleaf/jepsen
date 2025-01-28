@@ -197,7 +197,7 @@
      :key-dist             key-dist
      ; Nemesis related
      :no-kills             (rand-nth (list true false))
-     :clean-kills          (rand-nth (list true false))
+     :clean-kill          (rand-nth (list true false))
      :no-partitions        (rand-nth (list true false))
      :no-clocks            (rand-nth (list true false))
      :no-revives           (rand-nth (list true false))
