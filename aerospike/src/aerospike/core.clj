@@ -189,7 +189,9 @@
                              (rand-nth (range 8 12)))
         ;; cluster-size       (count (:nodes opts))
         nClients           (* 2 (+ 1 (rand-int 15)))]
-    {:concurrency          (get opts :concurrency nClients)
+    {:concurrency          (if (.contains (:argv opts) "--concurrency")
+                             (get opts :concurrency)
+                             (do (info "NO CONCURRENCY OPTION PROVIDED") nClients))
      ; Txn Specific
      :min-txn-length       txn-min-ops
      :max-txn-length       (rand-nth (range txn-min-ops 12))
