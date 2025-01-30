@@ -19,7 +19,7 @@
                     [store     :as store]
                     [tests     :as tests]]
             [jepsen.control [net :as net]
-                            [util :as net/util]]
+                            [util :as netUtil]]
             [jepsen.checker.timeline :as timeline]
             [jepsen.nemesis.time :as nt]
             [jepsen.os.debian :as debian]
@@ -36,20 +36,20 @@
                                  Record)
            (com.aerospike.client.cluster Node)
            (com.aerospike.client.policy Policy
-                                        ConsistencyLevel
+                                        ;; ConsistencyLevel
                                         GenerationPolicy
                                         WritePolicy)))
 
 (defrecord CounterClient [client namespace set key]
   client/Client
-  (setup! [this test node]
+  (open! [this test node]
     (let [client (s/connect node)]
-      (Thread/sleep 3000) ; TODO: remove?
-      (s/put! client namespace set key {:value 0})
       (assoc this :client client)))
 
+  (setup! [this test] this)
+
   (invoke! [this test op]
-    (s/with-errors op #{:read}
+    (s/with-modern-errors op
       (case (:f op)
         :read (assoc op :type :ok
                      :value (-> client (s/fetch namespace set key) :bins :value))
@@ -57,7 +57,9 @@
         :add  (do (s/add! client namespace set key {:value (:value op)})
                   (assoc op :type :ok)))))
 
-  (teardown! [this test]
+  (teardown! [this test])
+
+  (close! [this test]
     (s/close client)))
 
 (defn counter-client

@@ -3,6 +3,7 @@
   SCP for copying even medium-sized files of a few GB. This provides a faster
   implementation of a Remote which shells out to SCP."
   (:require [clojure.string :as str]
+            [clojure.java.io :as io]
             [clojure.tools.logging :refer [info warn]]
             [jepsen.util :as util]
             [jepsen.control.core :as core]
@@ -60,6 +61,7 @@
   "Runs an SCP command by shelling out. Takes a conn-spec (used for port, key,
   etc), a seq of sources, and a single destination, all as strings."
   [conn-spec sources dest]
+  ;; bob scp initially seemed to need -O as workaround in current implementation
   (apply util/sh "scp" "-rpC"
          "-P" (str (:port conn-spec))
          (concat (when-let [k (:private-key-path conn-spec)]
@@ -107,8 +109,9 @@
             ; Upload to tmpfile
             (core/upload! this {} src tmp nil)
             ; Chown and move to dest, as root
+            (info "Moving <"src"> as <"tmp"> to <"dest">")
             (exec! cmd-remote {:sudo "root"} [:chown sudo tmp])
-            (exec! cmd-remote {:sudo "root"} [:mv tmp dest]))))))
+	    (exec! cmd-remote {:sudo "root"} [:mv tmp dest]))))))
 
   (download! [this ctx srcs dest _]
     (let [sudo (:sudo ctx)]

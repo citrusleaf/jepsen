@@ -124,8 +124,7 @@
   [default]
   (package-opt "tarball" default))
 
-(defn test-usage
-  []
+(def test-usage 
   "Usage: lein run -- COMMAND [OPTIONS ...]
 
 Runs a Jepsen test and exits with a status code:
@@ -326,6 +325,7 @@ Options:\n")
           (System/exit 254))
 
         ; Run!
+        (info "parsed" parsed-opts)
         (run parsed-opts)
         (System/exit 0)))
 
