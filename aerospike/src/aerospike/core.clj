@@ -87,10 +87,14 @@
     :parse-fn #(Long/parseLong %)
                  ; TODO: must be >= min-txn-length
     :validate [pos? "must be positive"]]
-   [nil "--min-txn-length MIN" "Maximum number of micro-ops per transaction"
+   [nil "--min-txn-length MIN" "Minimum number of micro-ops per transaction"
     :parse-fn #(Long/parseLong %)
                  ; TODO: must be <= min-txn-length
     :validate [pos? "must be positive"]]
+   [nil "--key-dist DISTRIBUTION" 
+    "exponential / uniform distribution for elle txn generator to use"
+    :parse-fn keyword
+    :validate [#{:exponential :uniform} (cli/one-of [:exponential :uniform])]]
    [nil "--key-count N_KEYS" "Number of active keys at any given time"
     :parse-fn #(Long/parseLong %)
     :validate [pos? "must be positive"]]
