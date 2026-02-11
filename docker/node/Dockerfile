@@ -1,7 +1,7 @@
 # See https://salsa.debian.org/jgoerzen/docker-debian-base
 # See https://hub.docker.com/r/jgoerzen/debian-base-standard
-FROM jgoerzen/debian-base-minimal:bookworm as debian-addons
-FROM debian:bookworm-slim
+FROM jgoerzen/debian-base-minimal:bookworm@sha256:6171d4d438f1d48fd8dbed622ce7045255dd2783be5433d6fa9531d1327f8ba2 as debian-addons
+FROM debian:bookworm-slim@sha256:98f4b71de414932439ac6ac690d7060df1f27161073c5036a7553723881bffbe
 
 COPY --from=debian-addons /usr/local/preinit/ /usr/local/preinit/
 COPY --from=debian-addons /usr/local/bin/ /usr/local/bin/
